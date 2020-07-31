@@ -47,7 +47,7 @@ cdist.plot <- function(cd, ymax=3000){
                  ylab = "Distance (km)", xlab = "Date",
                  ylim = c(0,ymax),
                  main = "Cumulative daily distance traveled (km)")
-    ndays <- nrow(cd)
+    ndays = nrow(cd)
     mytickindz = c(seq(1, ndays, by = round(ndays / 8,0)), ndays)
     myticklabs = cd$date[mytickindz]
     graphics::axis(1, at = myticklabs, labels = FALSE)
@@ -73,7 +73,7 @@ cdist.plot <- function(cd, ymax=3000){
 #' cdist.fig(cd, ymax = 4500)}
 
 cdist.fig <- function(cd, ymax, figdir.path = getwd()){
-	animal_id <- as.character(cd$animal_id[1])
+	animal_id = as.character(cd$animal_id[1])
 	grDevices::png(paste0(figdir.path, "/Animal_", animal_id, "_CumulStep.png"),
         width = 6.5, height = 6.5, units = "in", res = 192)
     telonicsGPS::cdist.plot(cd = cd, ymax = ymax)
