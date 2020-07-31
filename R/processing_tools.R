@@ -32,10 +32,9 @@ telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL){
         telcsv$animal_id = NA
         warning("Animal IDs were not provided, animal_id column filled with NA values.")
     }
-    telcsv = telcsv[,c(ncol(telcsv),1:(ncol(telcsv)-1))]
+    telcsv = telcsv[!is.na(telcsv$animal_id),c(ncol(telcsv),1:(ncol(telcsv)-1))]
     return(telcsv)
 }
-
 
 
 
