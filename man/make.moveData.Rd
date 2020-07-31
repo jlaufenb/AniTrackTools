@@ -7,7 +7,7 @@
 make.moveData(att, by = "animal_id")
 }
 \arguments{
-\item{att}{Data.frame containing GPS data following output format of csv2df function}
+\item{att}{Data.frame containing GPS data following output format of \code{import_telcsv} function}
 
 \item{by}{Character string containing name of column to be used to partition moveHMM data. Default is set to \code{animal_id}}
 }
@@ -19,7 +19,7 @@ Convert GPS Data to moveData Class from moveHMM Package
 }
 \examples{
 \dontrun{
-telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))
+gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+att_df <- telcsv2ATT(telcsv = gps_df, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))
 make.moveData(att)}
 }

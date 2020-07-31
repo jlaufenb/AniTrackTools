@@ -11,8 +11,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-#' telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
+#' gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+#' telcsv2ATT(telcsv = gps_df, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
 
 telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL){
     ti_names = c("Collar_CTN","GPS_Fix_Time","GPS_Fix_Attempt","GPS_Latitude","GPS_Longitude",
@@ -51,8 +51,8 @@ telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL){
 #'
 #' @examples
 #' \dontrun{
-#' telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-#' att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))
+#' gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+#' att_df <- telcsv2ATT(telcsv = gps_df, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))
 #' make.moveData(att)}
 
 make.moveData <- function(att, by = "animal_id"){

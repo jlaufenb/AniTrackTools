@@ -9,7 +9,7 @@ telcsv2ATT(telcsv = NULL, animal_ids = NULL)
 \arguments{
 \item{telcsv}{Value from \code{import_telcsv} or data.frame with column names matching those from Telonics CSV file produced by the Telonics Data Converter software.}
 
-\item{animal_ids}{A data.frame matching CTNs (animal_id$collar_id) with animal IDs (animal_id$animal_id)}
+\item{animal_ids}{A data.frame matching CTNs (\code{animal_ids$collar_id}) with animal IDs (\code{animal_ids$animal_id})}
 }
 \value{
 A data.frame formatted for use by other functions in the \code{AniTrackTools} package
@@ -19,6 +19,6 @@ Convert Telonics CSV to AniTrackTools Format
 }
 \examples{
 \dontrun{
-telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
+gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+telcsv2ATT(telcsv = gps_df, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
 }

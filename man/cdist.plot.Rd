@@ -19,9 +19,9 @@ Plot Daily Cumulative Distance Traveled
 }
 \examples{
 \dontrun{
-telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))
-moveData <- make.moveData(att)
+gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+att_df <- telcsv2ATT(telcsv = gps_df, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))
+moveData <- make.moveData(att_df)
 cd <- calc.cdist(moveData)
 cdist.plot(cd, ymax = 4500)}
 }
