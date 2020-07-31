@@ -17,10 +17,3 @@ plot
 \description{
 Plot Daily Cumulative Distance Traveled
 }
-\examples{
-\dontrun{
- gps_df <- csv2df(file = "700516A Complete.csv", nskip = 23)
-moveData <- make.moveData(gps_df)
-cd <- calc.cdist(moveData)
-cdist.plot(cd, ymax = 4500)}
-}

@@ -19,10 +19,3 @@ PNG file written to working directory or user-specified directory path
 \description{
 Write plot of daily cumulative distance traveled to PNG file
 }
-\examples{
-\dontrun{
-gps_df <- csv2df(file = "700516A Complete.csv", nskip = 23)
-moveData <- make.moveData(gps_df)
-cd <- calc.cdist(moveData)
-cdist.fig(cd, ymax = 4500)}
-}

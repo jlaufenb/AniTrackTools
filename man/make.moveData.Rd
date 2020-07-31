@@ -4,19 +4,16 @@
 \alias{make.moveData}
 \title{Convert GPS Data to moveData Class from moveHMM Package}
 \usage{
-make.moveData(gps_df)
+make.moveData(att, by = "animal_id")
 }
 \arguments{
-\item{gps_df}{Data.frame containing GPS data following output format of csv2df function}
+\item{att}{Data.frame containing GPS data following output format of csv2df function}
+
+\item{by}{Character string containing name of column to be used to partition moveHMM data. Default is set to \code{animal_id}}
 }
 \value{
 R object of class moveData
 }
 \description{
 Convert GPS Data to moveData Class from moveHMM Package
-}
-\examples{
-\dontrun{
-gps_df <- csv2df(file = "700516A Complete.csv", nskip = 23)
-make.moveData(gps_df)}
 }
