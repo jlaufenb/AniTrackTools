@@ -4,7 +4,7 @@
 #' Convert Telonics CSV to AniTrackTools Format
 #'
 #' @param telcsv Value from \code{import_telcsv} or data.frame with column names matching those from Telonics CSV file produced by the Telonics Data Converter software.
-#' @param animal_ids A data.frame matching CTNs (animal_id$collar_id) with animal IDs (animal_id$animal_id)
+#' @param animal_ids A data.frame matching CTNs (\code{animal_ids$collar_id}) with animal IDs (\code{animal_ids$animal_id})
 #'
 #' @return A data.frame formatted for use by other functions in the \code{AniTrackTools} package
 #' @export
@@ -43,7 +43,7 @@ telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL){
 
 #' Convert GPS Data to moveData Class from moveHMM Package
 #'
-#' @param att Data.frame containing GPS data following output format of csv2df function
+#' @param att Data.frame containing GPS data following output format of \code{import_telcsv} function
 #' @param by Character string containing name of column to be used to partition moveHMM data. Default is set to \code{animal_id}
 #'
 #' @return R object of class moveData

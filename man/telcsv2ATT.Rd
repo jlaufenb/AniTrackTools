@@ -17,3 +17,8 @@ A data.frame formatted for use by other functions in the \code{AniTrackTools} pa
 \description{
 Convert Telonics CSV to AniTrackTools Format
 }
+\examples{
+\dontrun{
+telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
+}

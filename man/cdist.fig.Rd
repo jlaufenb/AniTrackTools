@@ -19,3 +19,11 @@ PNG file written to working directory or user-specified directory path
 \description{
 Write plot of daily cumulative distance traveled to PNG file
 }
+\examples{
+\dontrun{
+telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))
+moveData <- make.moveData(att)
+cd <- calc.cdist(moveData)
+cdist.fig(cd, ymax = 4500)}
+}
