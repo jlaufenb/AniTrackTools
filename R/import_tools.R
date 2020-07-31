@@ -1,11 +1,12 @@
 
 #' Import Telonics Iridium CSV File
 #'
-#' @param file Character string containing path and file name of Telonics Iridium CSV file
+#' @param file Character string containing path and file name of Telonics Iridium CSV file.
 #' @param nskip Number of rows to remove from top of Iridium CSV file. This number may vary.
-#' @param fix_attempt_keep Location quality categories to retain
+#' @param fix_attempt_keep Character vector containing location quality categories to retain.
+#' @param time_units Character string specyfing units used to round GPS_Fix_Time variable. Follows round.POSIXt usage. Default set to "hours".
 #'
-#' @return Formatted data.frame
+#' @return Formatted data.frame. NOTE: GPS_Fix_Time variable is rounded to nearest hour by default.
 #' @export
 #'
 #' @examples
@@ -14,29 +15,30 @@
 
 import_telcsv <- function(file,
                    nskip = 23,
-                   fix_attempt_keep = NULL){
+                   fix_attempt_keep = NULL,
+                   time_units = "hours"){
     ## load file
     x = readLines(file)
-    ctn <- x[which(grepl("CTN",x))]
+    ctn = x[which(grepl("CTN",x))]
     ctn = substr(ctn, regexpr(",", ctn) + 1, nchar(ctn))
-    x = utils::read.csv(textConnection(paste0(x[-(1:nskip)],collapse="\n")),stringsAsFactors=FALSE)
+    x = utils::read.csv(textConnection(paste0(x[-(1:nskip)],collapse="\n")), stringsAsFactors = FALSE)
     ## reformat column names
-    names(x) <- gsub("\\.", "\\_", names(x))
+    names(x) = gsub("\\.", "\\_", names(x))
     ## add CTN variable
     x$Collar_CTN = ctn
     ## reorder columns
-    x <- x[,c(ncol(x),1:(ncol(x)-1))]
+    x = x[,c(ncol(x),1:(ncol(x)-1))]
     ## Convert Schedule_Set variable to factor
-    scheds <- c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3")
+    scheds = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3")
     x$Schedule_Set = factor(x$Schedule_Set, levels = scheds) # convert GPS fix type to factor
     ## Convert GPS_Fix_Time variable to POSIXct
-    x$GPS_Fix_Time = as.POSIXct(round(as.POSIXct(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"),"hours"))
+    x$GPS_Fix_Time = as.POSIXct(round(as.POSIXct(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units))
     ## subset data by GPS_Fix_Attempt and convert GPS_Fix_Attempt to factor
-    if(is.null(fix_attempt_keep))fix_attempt_keep <- c("Resolved QFP", "Resolved QFP (Uncertain)", "Unresolved QFP")
+    if(is.null(fix_attempt_keep))fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)", "Unresolved QFP")
     x = x[x$GPS_Fix_Attempt %in% fix_attempt_keep, ]
-    x$GPS_Fix_Attempt <- factor(x$GPS_Fix_Attempt, levels = fix_attempt_keep)
+    x$GPS_Fix_Attempt = factor(x$GPS_Fix_Attempt, levels = fix_attempt_keep)
     ## Remove duplicate fix times
-    x <- x[!duplicated(x$GPS_Fix_Time),]
+    x = x[!duplicated(x$GPS_Fix_Time),]
     if(nrow(x)==0){
         warning("No valid location data. NULL value returned. ")
         x = list(NULL)
@@ -73,7 +75,7 @@ import_tpf <- function(file){
                       "sections.auxiliary2ScheduleSet.parameters.qfpScheduleUpdatePeriod",
                       "sections.auxiliary3ScheduleSet.parameters.qfpScheduleUpdatePeriod")
     ## custom function to calculate fix rate for a given sched.marker
-    calc.tpf.hours <- function(tpf, marker){
+    calc.tpf.hours = function(tpf, marker){
         days = 0
         hours = 0
         tpf.line = tpf[grep(marker,tpf)]
