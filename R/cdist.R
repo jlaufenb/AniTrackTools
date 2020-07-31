@@ -8,8 +8,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-#' moveData <- make.moveData(gps_df)
+#' telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+#' att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
+#' moveData <- make.moveData(att)
 #' calc.cdist(moveData)}
 
 calc.cdist <- function(moveData){
@@ -35,8 +36,9 @@ calc.cdist <- function(moveData){
 #'
 #' @examples
 #' \dontrun{
-#' gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-#' moveData <- make.moveData(gps_df)
+#' telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+#' att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
+#' moveData <- make.moveData(att)
 #' cd <- calc.cdist(moveData)
 #' cdist.plot(cd, ymax = 4500)}
 
@@ -64,8 +66,9 @@ cdist.plot <- function(cd, ymax=3000){
 #'
 #' @examples
 #' \dontrun{
-#' gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-#' moveData <- make.moveData(gps_df)
+#' telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
+#' att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
+#' moveData <- make.moveData(att)
 #' cd <- calc.cdist(moveData)
 #' cdist.fig(cd, ymax = 4500)}
 
