@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)}
+#' telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
 #' telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
 
 telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL){
@@ -52,7 +52,7 @@ telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL){
 #' @examples
 #' \dontrun{
 #' telcsv <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
-#' att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
+#' att <- telcsv2ATT(telcsv = telcsv, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))
 #' make.moveData(att)}
 
 make.moveData <- function(att, by = "animal_id"){
