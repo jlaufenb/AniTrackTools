@@ -10,4 +10,4 @@ endorsement of any commercial product or activity by FWS or the United States
 Government.
 
 # AniTrackTools
-AniTrackTools is an R package for animal tracking data with tools for importing, processing, and visualization.
+AniTrackTools is an R package with tools for importing, processing, and visualizing animal tracking data.
