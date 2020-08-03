@@ -4,12 +4,14 @@
 \alias{telcsv2ATT}
 \title{Convert Telonics CSV to AniTrackTools Format}
 \usage{
-telcsv2ATT(telcsv = NULL, animal_ids = NULL)
+telcsv2ATT(telcsv = NULL, animal_ids = NULL, release_sites = NULL)
 }
 \arguments{
 \item{telcsv}{Value from \code{import_telcsv} or data.frame with column names matching those from Telonics CSV file produced by the Telonics Data Converter software.}
 
 \item{animal_ids}{A data.frame matching CTNs (\code{animal_ids$collar_id}) with animal IDs (\code{animal_ids$animal_id})}
+
+\item{release_sites}{A data.frame matching animal IDs (\code{release_sites$animal_id}) with animal release site (\code{release_sites$release_site})}
 }
 \value{
 A data.frame formatted for use by other functions in the \code{AniTrackTools} package

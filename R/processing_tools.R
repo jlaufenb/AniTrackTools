@@ -5,6 +5,7 @@
 #'
 #' @param telcsv Value from \code{import_telcsv} or data.frame with column names matching those from Telonics CSV file produced by the Telonics Data Converter software.
 #' @param animal_ids A data.frame matching CTNs (\code{animal_ids$collar_id}) with animal IDs (\code{animal_ids$animal_id})
+#' @param release_sites A data.frame matching animal IDs (\code{release_sites$animal_id}) with animal release site (\code{release_sites$release_site})
 #'
 #' @return A data.frame formatted for use by other functions in the \code{AniTrackTools} package
 #' @export
@@ -14,7 +15,7 @@
 #' gps_df <- import_telcsv(file = "700516A Complete.csv", nskip = 23)
 #' telcsv2ATT(telcsv = gps_df, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
 
-telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL){
+telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL, release_sites = NULL){
     ti_names = c("Collar_CTN","GPS_Fix_Time","GPS_Fix_Attempt","GPS_Latitude","GPS_Longitude",
                  "GPS_Horizontal_Dilution","GPS_Satellite_Count","Schedule_Set")
     att_names = c("collar_id","fixtime","fixtype","lat","lon","hdop","nsats","fixsched")
@@ -31,6 +32,12 @@ telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL){
     }else{
         telcsv$animal_id = NA
         warning("Animal IDs were not provided, animal_id column filled with NA values.")
+    }
+    if(!is.null(release_sites)){
+        telcsv$release_site = sites$release_site[match(telcsv$animal_id, release_sites$animal_id)]
+    }else{
+        telcsv$release_site = NA
+        warning("Animal release sites were not provided, release_site column filled with NA values.")
     }
     telcsv = telcsv[!is.na(telcsv$animal_id),c(ncol(telcsv),1:(ncol(telcsv)-1))]
     return(telcsv)
