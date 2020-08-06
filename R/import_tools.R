@@ -74,7 +74,7 @@ import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
         nfiles = length(path)
         csv_list = vector("list", nfiles)
         for(i in 1:nfiles){
-            csv_list[[i]] = import_fn(path[i])
+            csv_list[[i]] = AniTrackTools::import_fn(path[i])
             cat("------------------------------------------------------------------------------------------\n\n",
                 "Processing file ", i, "of ", nfiles, "\n\n",
                 "File path: ", path[i], "\n\n")
@@ -86,7 +86,7 @@ import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
         nfiles = length(files)
         csv_list = vector("list", nfiles)
         for(i in 1:nfiles){
-            csv_list[[i]] = import_fn(files[i])
+            csv_list[[i]] = AniTrackTools::import_fn(files[i])
             cat("------------------------------------------------------------------------------------------\n\n",
                 "Processing file ", i, "of ", nfiles, "\n\n",
                 "File path: ", files[i], "\n\n")

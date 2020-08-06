@@ -3,7 +3,7 @@
 export(calc.cdist)
 export(cdist.fig)
 export(cdist.plot)
-export(import_telcsv)
+export(import_TelCSVfiles)
 export(import_tpf)
 export(make.moveData)
 export(telcsv2ATT)
