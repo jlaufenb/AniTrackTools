@@ -91,7 +91,7 @@ import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
                 "Processing file ", i, "of ", nfiles, "\n\n",
                 "File path: ", files[i], "\n\n")
         }
-        cat("Compiling files\n\n")
+        cat("Compiling files ...\n\n")
         df = do.call("rbind", csv_list)
     }
     return(df)
