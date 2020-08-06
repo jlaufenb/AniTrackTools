@@ -4,17 +4,19 @@
 \alias{import_telcsv}
 \title{Import Telonics Iridium CSV File}
 \usage{
-import_telcsv(file, nskip = 23, fix_attempt_keep = NULL)
+import_telcsv(file, nskip = 23, fix_attempt_keep = NULL, time_units = "hours")
 }
 \arguments{
-\item{file}{Character string containing path and file name of Telonics Iridium CSV file}
+\item{file}{Character string containing path and file name of Telonics Iridium CSV file.}
 
 \item{nskip}{Number of rows to remove from top of Iridium CSV file. This number may vary.}
 
-\item{fix_attempt_keep}{Location quality categories to retain}
+\item{fix_attempt_keep}{Character vector containing location quality categories to retain.}
+
+\item{time_units}{Character string specyfing units used to round GPS_Fix_Time variable. Follows round.POSIXt usage. Default set to "hours".}
 }
 \value{
-Formatted data.frame
+Formatted data.frame. NOTE: GPS_Fix_Time variable is rounded to nearest hour by default.
 }
 \description{
 Import Telonics Iridium CSV File

@@ -34,12 +34,12 @@ telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL, release_sites = NULL){
         warning("Animal IDs were not provided, animal_id column filled with NA values.")
     }
     if(!is.null(release_sites)){
-        telcsv$release_site = sites$release_site[match(telcsv$animal_id, release_sites$animal_id)]
+        telcsv$release_site = release_sites$release_site[match(telcsv$animal_id, release_sites$animal_id)]
     }else{
         telcsv$release_site = NA
         warning("Animal release sites were not provided, release_site column filled with NA values.")
     }
-    telcsv = telcsv[!is.na(telcsv$animal_id),c(ncol(telcsv),1:(ncol(telcsv)-1))]
+    telcsv = telcsv[!is.na(telcsv$animal_id), c("animal_id",att_names,"release_site")]
     return(telcsv)
 }
 
