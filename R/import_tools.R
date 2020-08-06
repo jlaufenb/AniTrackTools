@@ -1,22 +1,19 @@
 
-#' Import Telonics Iridium CSV File
+#' Internal Function to Import Individual Telonics Iridium CSV File
 #'
 #' @param file Character string containing path and file name of Telonics Iridium CSV file.
 #' @param nskip Number of rows to remove from top of Iridium CSV file. This number may vary.
 #' @param fix_attempt_keep Character vector containing location quality categories to retain.
 #' @param time_units Character string specyfing units used to round GPS_Fix_Time variable. Follows round.POSIXt usage. Default set to "hours".
 #'
-#' @return Formatted data.frame. NOTE: GPS_Fix_Time variable is rounded to nearest hour by default.
-#' @export
+#' @return Formatted data.frame. NOTE: Time variables are rounded to nearest hour by default.
 #'
-#' @examples
-#' \dontrun{
-#' import_telcsv(file = "700516A Complete.csv", nskip = 23)}
 
-import_telcsv <- function(file,
+import_fn <- function(file,
                    nskip = 23,
-                   fix_attempt_keep = NULL,
-                   time_units = "hours"){
+                   fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
+                   time_units = "hours"
+                   ){
     ## load file
     x = readLines(file)
     ctn = x[which(grepl("CTN",x))]
@@ -31,20 +28,75 @@ import_telcsv <- function(file,
     ## Convert Schedule_Set variable to factor
     scheds = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3")
     x$Schedule_Set = factor(x$Schedule_Set, levels = scheds) # convert GPS fix type to factor
-    ## Convert GPS_Fix_Time variable to POSIXct
-    x$GPS_Fix_Time = as.POSIXct(round(as.POSIXct(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units))
+    ## Convert time variables to POSIXct
+    x$Acquisition_Time = round(as.POSIXct(x$Acquisition_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units)
+    x$Acquisition_Start_Time = round(as.POSIXct(x$Acquisition_Start_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units)
+    x$GPS_Fix_Time = round(as.POSIXct(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units)
+    x$Receive_Time = round(as.POSIXct(x$Receive_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units)
     ## subset data by GPS_Fix_Attempt and convert GPS_Fix_Attempt to factor
-    if(is.null(fix_attempt_keep))fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)", "Unresolved QFP")
     x = x[x$GPS_Fix_Attempt %in% fix_attempt_keep, ]
     x$GPS_Fix_Attempt = factor(x$GPS_Fix_Attempt, levels = fix_attempt_keep)
     ## Remove duplicate fix times
     x = x[!duplicated(x$GPS_Fix_Time),]
     if(nrow(x)==0){
-        warning("No valid location data. NULL value returned. ")
+        warning(paste0("No valid location data. NULL value returned for CTN ", ctn, ". "))
         x = list(NULL)
     }
     return(x)
 }
+
+
+#' Import Telonics Iridium CSV File(s)
+#'
+#' @param path Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s) or character string specifying path to folder containing Telonics Iridium CSV file(s).
+#' @param csv_pattern Character string specifying text pattern used to select specific CSV files.
+#' @param ... Additional arguments to pass on
+#'
+#' @return Formatted data.frame. NOTE: Time variables are rounded to nearest hour by default.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' ## import only using file name based current working directory
+#' import_TelCSVfiles(path = "700516A Complete.csv")
+#'
+#' ## import using character vector specifying directory paths and file names
+#' files <- list.files("../directory_path", pattern = "Complete", full = TRUE)
+#' import_TelCSVfiles(path = files)
+#'
+#' ## import using character string specifying directory path to folder storing files
+#' import_TelCSVs(path = "../directory_path", csv_pattern = "Complete")}
+
+import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
+    ## message
+    if(all(grepl(path, ".csv"))){
+        nfiles = length(path)
+        csv_list = vector("list", nfiles)
+        for(i in 1:nfiles){
+            csv_list[[i]] = import_fn(path[i])
+            cat("------------------------------------------------------------------------------------------\n\n",
+                "Processing file ", i, "of ", nfiles, "\n\n",
+                "File path: ", path[i], "\n\n")
+        }
+        df = do.call("rbind", csv_list)
+    }
+    if(length(path) == 1 & !grepl(path, ".csv")){
+        files = list.files(path, pattern = csv_pattern, full = TRUE)
+        nfiles = length(files)
+        csv_list = vector("list", nfiles)
+        for(i in 1:nfiles){
+            csv_list[[i]] = import_fn(files[i])
+            cat("------------------------------------------------------------------------------------------\n\n",
+                "Processing file ", i, "of ", nfiles, "\n\n",
+                "File path: ", files[i], "\n\n")
+        }
+        df = do.call("rbind", csv_list)
+    }
+    return(df)
+}
+
+
 
 #' Import Telonics TPF File and Extract CTNs, IMEIs, and Fix-Rate Schedules
 #'
