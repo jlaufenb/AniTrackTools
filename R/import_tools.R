@@ -9,10 +9,9 @@
 #' @return Formatted data.frame. NOTE: Time variables are rounded to nearest hour by default.
 #'
 
-import_telfn <- function(file,
+import_telirid <- function(file,
                    nskip = 23,
-                   fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
-                   time_units = "hours"
+                   fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)")
                    ){
     ## load file
     x = readLines(file)
@@ -29,10 +28,10 @@ import_telfn <- function(file,
     scheds = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3")
     x$Schedule_Set = factor(x$Schedule_Set, levels = scheds) # convert GPS fix type to factor
     ## Convert time variables to POSIXct
-    x$Acquisition_Time = round(as.POSIXct(x$Acquisition_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units)
-    x$Acquisition_Start_Time = round(as.POSIXct(x$Acquisition_Start_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units)
-    x$GPS_Fix_Time = round(as.POSIXct(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units)
-    x$Receive_Time = round(as.POSIXct(x$Receive_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S"), time_units)
+    x$Acquisition_Time = as.POSIXlt(x$Acquisition_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+    x$Acquisition_Start_Time = as.POSIXlt(x$Acquisition_Start_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+    x$GPS_Fix_Time = as.POSIXlt(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+    x$Receive_Time = as.POSIXlt(x$Receive_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
     ## subset data by GPS_Fix_Attempt and convert GPS_Fix_Attempt to factor
     x = x[x$GPS_Fix_Attempt %in% fix_attempt_keep, ]
     x$GPS_Fix_Attempt = factor(x$GPS_Fix_Attempt, levels = fix_attempt_keep)
