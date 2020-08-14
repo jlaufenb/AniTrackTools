@@ -47,7 +47,10 @@ import_telirid <- function(file,
 
 #' Import Telonics Iridium CSV File(s)
 #'
-#' @param path Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s) or character string specifying path to folder containing Telonics Iridium CSV file(s).
+#' @param path Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
+#' character string specifying path to folder containing Telonics Iridium CSV file(s), or
+#' character string specifying path to root folder containing folders with Telonics Iridium CSV file(s).\cr\cr
+#' NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument.
 #' @param csv_pattern Character string specifying text pattern used to select specific CSV files.
 #' @param ... Additional arguments to pass on
 #'
