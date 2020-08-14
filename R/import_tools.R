@@ -81,7 +81,7 @@ import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
         df = do.call("rbind", csv_list)
     }
     if(length(path) == 1 & !grepl(path, ".csv")){
-        files = list.files(path, pattern = csv_pattern, full = TRUE)
+        files = list.files(path, pattern = csv_pattern, full = TRUE, ...)
         nfiles = length(files)
         csv_list = vector("list", nfiles)
         for(i in 1:nfiles){
