@@ -1,7 +1,7 @@
 Package: AniTrackTools
 Type: Package
 Title: Tools for Working with Animal Tracking Data
-Version: 0.1.0
+Version: 0.0.0.9000
 Author: Jared Laufenberg
 Maintainer: Jared Laufenberg <jared_laufenberg@fws.gov>
 Description: Suite of R functions used to work with animal tracking data.
