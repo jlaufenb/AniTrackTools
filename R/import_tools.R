@@ -1,131 +1,177 @@
 
+#' Import Telonics GPS collar data (generalized version of `import_TelCSVfiles`)
+#'
+#' @param path Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
+#' character string specifying path to folder containing Telonics Iridium CSV file(s), or
+#' character string specifying path to root folder containing folders with Telonics Iridium CSV file(s).\cr\cr
+#' NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument.
+#' @param collar_type Character string specifying the type of GPS collar for which data is to be imported. Accepted values include:
+#'   \itemize{
+#'     \item{"Telonics Spreadspectrum"}
+#'     \item{"Telonics Iridium"}
+#'     }
+#' @param nskip Numeric value indicating the number of rows to remove from top of the CSV file
+#' @param report_format Character string specifying Telonics report format.  Accepted values include:
+#'   \itemize{
+#'     \item{"Complete"}
+#'     \item{"Condensed"}
+#'     }
+#' @param ... Additional arguments to pass on.
+#'
+#' @return Dataframe containing GPS collar data.
+#' @export
+#'
+#' @examples
+
+import_tel_gps <- function(path,
+                           collar_type = NULL,
+                           nskip = NULL,
+                           report_format = NULL,
+                           ...){
+
+    collar_types = c("Telonics Iridium", "Telonics Spreadspectrum")
+    if(!collar_type %in% collar_types)
+        stop("Select your type of collar. Options are: 'Telonics Iridium' or 'Telonics Spreadspectrum'.")
+
+    if(is.null(nskip))
+        stop("Must specify number of header lines in CSV file to skip.")
+
+    message(paste("\n\nImporting", collar_type, "collar data...\n\n"))
+
+    # Select which collar import function to use
+    if (collar_type == "Telonics Spreadspectrum"){
+        df <-
+            list.files(path = dir_path,
+                       pattern = "*.csv",
+                       full.names = TRUE,
+                       recursive = TRUE) %>%
+            map_df(function(x) import_telsst(x)) %>%
+            unique()
+    }
+
+    if (collar_type == "Telonics Iridium"){
+
+        ## code conditions on report formats 'Complete' or 'Condensed'
+        if(!report_format %in% c("Complete", "Condensed"))
+            stop("User must specify 'Complete' or 'Condensed' for report_format argument if importing Telonics Iridium collar data.")
+
+        ## file name(s) provided
+        if(all(grepl(path, ".csv"))){
+            nfiles = length(path)
+            csv_list = vector("list", nfiles)
+            for(i in 1:nfiles){
+                csv_list[[i]] = import_telirid(path[i], ...)
+                cat("------------------------------------------------------------------------------------------\n\n",
+                    "Processing file ", i, "of ", nfiles, "\n\n",
+                    "File path: ", path[i], "\n\n")
+            }
+            df = do.call("rbind", csv_list)
+        }
+
+
+        ## path to folder containing file(s) provided
+        if(length(path) == 1 & !grepl(path, ".csv")){
+            files = list.files(path, full = TRUE, ...)
+            nfiles = length(files)
+            csv_list = vector("list", nfiles)
+            for(i in 1:nfiles){
+                csv_list[[i]] = import_telirid(files[i], ...)
+                cat("------------------------------------------------------------------------------------------\n\n",
+                    "Processing file ", i, "of ", nfiles, "\n\n",
+                    "File path: ", files[i], "\n\n")
+            }
+            cat("Compiling files ...\n\n")
+            df = do.call("rbind", csv_list)
+        }
+    }
+
+    return(df)
+    message("Done")
+
+}
+
+
+
+
 #' Internal Function to Import Individual Telonics Iridium CSV File
 #'
 #' @param file Character string containing path and file name of Telonics Iridium CSV file.
 #' @param nskip Number of rows to remove from top of Iridium CSV file. This number may vary.
 #' @param fix_attempt_keep Character vector containing location quality categories to retain.
-#' @param time_units Character string specyfing units used to round GPS_Fix_Time variable. Follows round.POSIXt usage. Default set to "hours".
+#' @param report_format Character string specifying Telonics report format of CSV files. Acceptable values are \code{Complete} and \code{Condensed}.
+#' @param colname_fun Function used to format column names of output data.frame. Default is the internal function \code{snake_case}.
 #'
-#' @return Formatted data.frame. NOTE: Time variables are rounded to nearest hour by default.
+#' @return Formatted data.frame.
 #'
 
 import_telirid <- function(file,
                    nskip = 23,
                    fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
-                   csv_pattern = NULL,
-                   colname_fun =
+                   report_format = NULL,
+                   recast = TRUE,
+                   colname_fun = "snake_case",
+                   ...
                    ){
-
-    ## code conditions on specific TDC formats labeled as 'Complete' or 'Condensed'
-    if(!csv_pattern %in% c("Complete", "Condensed"))
-        stop("User must specify 'Complete' or 'Condensed' for csv_pattern argument")
-
 
     ## load file
     x = readLines(file)
     ctn = x[which(grepl("CTN",x))]
     ctn = substr(ctn, regexpr(",", ctn) + 1, nchar(ctn))
     x = utils::read.csv(textConnection(paste0(x[-(1:nskip)],collapse="\n")), stringsAsFactors = FALSE)
-
-
-    ## reformat column names
-    names(x) = gsub("\\.", "\\_", names(x))
-
-
-    ## add CTN variable
-    x$Collar_CTN = ctn
-
-
-    ## reorder columns
-    x = x[,c(ncol(x),1:(ncol(x)-1))]
-
-
-    ## Recast Schedule_Set variable to factor
-    scheds = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3")
-    x$Schedule_Set = factor(x$Schedule_Set, levels = scheds) # convert GPS fix type to factor
-
-
-    ## Recast time variables as POSIXct
-    x$Acquisition_Time = as.POSIXlt(x$Acquisition_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
-    x$Acquisition_Start_Time = as.POSIXlt(x$Acquisition_Start_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
-    x$GPS_Fix_Time = as.POSIXlt(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
-    x$Receive_Time = as.POSIXlt(x$Receive_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
-
+    names(x) <- gsub("\\.", "\\_", names(x))
 
     ## subset data by GPS_Fix_Attempt and convert GPS_Fix_Attempt to factor
     x = x[x$GPS_Fix_Attempt %in% fix_attempt_keep, ]
-    x$GPS_Fix_Attempt = factor(x$GPS_Fix_Attempt, levels = fix_attempt_keep)
 
 
-    ## Remove duplicate fix times
-    x = x[!duplicated(x$GPS_Fix_Time),]
+    ## message for null data sets
     if(nrow(x)==0){
         warning(paste0("No valid location data for CTN ", ctn, "."))
         x = list(NULL)
+    }else{
+
+        ## add CTN variable
+        x$Collar_CTN = ctn
+
+
+        ## reorder columns
+        x = x[,c(ncol(x),1:(ncol(x)-1))]
+
+
+        ## Recast selected variables
+        if(recast){
+            scheds = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3")
+            x$Schedule_Set = factor(x$Schedule_Set, levels = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3"))
+            x$Acquisition_Time = as.POSIXlt(x$Acquisition_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+            x$Acquisition_Start_Time = as.POSIXlt(x$Acquisition_Start_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+            x$GPS_Fix_Time = as.POSIXlt(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+            x$Receive_Time = as.POSIXlt(x$Receive_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+            x$GPS_Fix_Attempt = factor(x$GPS_Fix_Attempt, levels = fix_attempt_keep)
+        }
+
+        ## Remove duplicate rows
+        x = unique(x)
+
+
+        ## reformat column names
+        names(x) = do.call(colname_fun, list(names(x)))
     }
 
     return(x)
 }
 
 
-#' Import Telonics Iridium CSV File(s)
-#'
-#' @param path Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
-#' character string specifying path to folder containing Telonics Iridium CSV file(s), or
-#' character string specifying path to root folder containing folders with Telonics Iridium CSV file(s).\cr\cr
-#' NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument.
-#' @param csv_pattern Character string specifying text pattern used to select specific CSV files.
-#' @param ... Additional arguments to pass on
-#'
-#' @return Formatted data.frame. NOTE: Time variables are rounded to nearest hour by default.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' ## import only using file name based current working directory
-#' import_TelCSVfiles(path = "700516A Complete.csv")
-#'
-#' ## import using character vector specifying directory paths and file names
-#' files <- list.files("../directory_path", pattern = "Complete", full = TRUE)
-#' import_TelCSVfiles(path = files)
-#'
-#' ## import using character string specifying directory path to folder storing files
-#' import_TelCSVs(path = "../directory_path", csv_pattern = "Complete")}
 
-import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
-
-    ## file name(s) provided
-    if(all(grepl(path, ".csv"))){
-        nfiles = length(path)
-        csv_list = vector("list", nfiles)
-        for(i in 1:nfiles){
-            csv_list[[i]] = import_telirid(path[i])
-            cat("------------------------------------------------------------------------------------------\n\n",
-                "Processing file ", i, "of ", nfiles, "\n\n",
-                "File path: ", path[i], "\n\n")
-        }
-        df = do.call("rbind", csv_list)
-    }
-
-
-    ## path to folder containing file(s) provided
-    if(length(path) == 1 & !grepl(path, ".csv")){
-        files = list.files(path, pattern = csv_pattern, full = TRUE, ...)
-        nfiles = length(files)
-        csv_list = vector("list", nfiles)
-        for(i in 1:nfiles){
-            csv_list[[i]] = import_telirid(files[i])
-            cat("------------------------------------------------------------------------------------------\n\n",
-                "Processing file ", i, "of ", nfiles, "\n\n",
-                "File path: ", files[i], "\n\n")
-        }
-        cat("Compiling files ...\n\n")
-        df = do.call("rbind", csv_list)
-    }
-
-    return(df)
+#' Internal Function Used to Reformat Column Names
+#'
+#' @param x Character vector
+#'
+#' @return Character vector in lower snake case format
+#'
+snake_case <- function(x){
+    tolower(gsub("\\.", "\\_", x))
 }
+
 
 
 
@@ -193,5 +239,66 @@ import_tpf <- function(file){
 
     ## compile output data.frame
     df = data.frame(ctn = ctns, imei = imeis, as.data.frame(t(fixschedule)), tpf_file = gsub(".*/","", file))
+    return(df)
+}
+
+
+
+
+#' Import Telonics Iridium CSV File(s)
+#'
+#' @param path Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
+#' character string specifying path to folder containing Telonics Iridium CSV file(s), or
+#' character string specifying path to root folder containing folders with Telonics Iridium CSV file(s).\cr\cr
+#' NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument.
+#' @param ... Additional arguments to pass on.
+#'
+#' @return Dataframe containing GPS collar data.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' ## import only using file name based current working directory
+#' import_TelCSVfiles(path = "700516A Complete.csv")
+#'
+#' ## import using character vector specifying directory paths and file names
+#' files <- list.files("../directory_path", pattern = "Complete", full = TRUE)
+#' import_TelCSVfiles(path = files)
+#'
+#' ## import using character string specifying directory path to folder storing files
+#' import_TelCSVs(path = "../directory_path", csv_pattern = "Complete")}
+
+import_TelCSVfiles <- function(path, ...){
+
+    ## file name(s) provided
+    if(all(grepl(path, ".csv"))){
+        nfiles = length(path)
+        csv_list = vector("list", nfiles)
+        for(i in 1:nfiles){
+            csv_list[[i]] = import_telirid(path[i], ...)
+            cat("------------------------------------------------------------------------------------------\n\n",
+                "Processing file ", i, "of ", nfiles, "\n\n",
+                "File path: ", path[i], "\n\n")
+        }
+        df = do.call("rbind", csv_list)
+    }
+
+
+    ## path to folder containing file(s) provided
+    if(length(path) == 1 & !grepl(path, ".csv")){
+        files = list.files(path, full = TRUE, ...)
+        nfiles = length(files)
+        csv_list = vector("list", nfiles)
+        for(i in 1:nfiles){
+            csv_list[[i]] = import_telirid(files[i], ...)
+            cat("------------------------------------------------------------------------------------------\n\n",
+                "Processing file ", i, "of ", nfiles, "\n\n",
+                "File path: ", files[i], "\n\n")
+        }
+        cat("Compiling files ...\n\n")
+        df = do.call("rbind", csv_list)
+    }
+
     return(df)
 }
