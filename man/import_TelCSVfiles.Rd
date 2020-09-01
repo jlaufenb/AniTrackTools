@@ -4,7 +4,7 @@
 \alias{import_TelCSVfiles}
 \title{Import Telonics Iridium CSV File(s)}
 \usage{
-import_TelCSVfiles(path, csv_pattern = NULL, ...)
+import_TelCSVfiles(path, ...)
 }
 \arguments{
 \item{path}{Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
@@ -12,12 +12,10 @@ character string specifying path to folder containing Telonics Iridium CSV file(
 character string specifying path to root folder containing folders with Telonics Iridium CSV file(s).\cr\cr
 NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument.}
 
-\item{csv_pattern}{Character string specifying text pattern used to select specific CSV files.}
-
-\item{...}{Additional arguments to pass on}
+\item{...}{Additional arguments to pass on.}
 }
 \value{
-Formatted data.frame. NOTE: Time variables are rounded to nearest hour by default.
+Dataframe containing GPS collar data.
 }
 \description{
 Import Telonics Iridium CSV File(s)

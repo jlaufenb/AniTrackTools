@@ -7,7 +7,11 @@
 import_telirid(
   file,
   nskip = 23,
-  fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)")
+  fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
+  report_format = NULL,
+  recast = TRUE,
+  colname_fun = "snake_case",
+  ...
 )
 }
 \arguments{
@@ -17,10 +21,12 @@ import_telirid(
 
 \item{fix_attempt_keep}{Character vector containing location quality categories to retain.}
 
-\item{time_units}{Character string specyfing units used to round GPS_Fix_Time variable. Follows round.POSIXt usage. Default set to "hours".}
+\item{report_format}{Character string specifying Telonics report format of CSV files. Acceptable values are \code{Complete} and \code{Condensed}.}
+
+\item{colname_fun}{Function used to format column names of output data.frame. Default is the internal function \code{snake_case}.}
 }
 \value{
-Formatted data.frame. NOTE: Time variables are rounded to nearest hour by default.
+Formatted data.frame.
 }
 \description{
 Internal Function to Import Individual Telonics Iridium CSV File
