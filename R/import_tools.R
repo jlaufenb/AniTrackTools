@@ -11,36 +11,59 @@
 
 import_telirid <- function(file,
                    nskip = 23,
-                   fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)")
+                   fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
+                   csv_pattern = NULL,
+                   colname_fun =
                    ){
+
+    ## code conditions on specific TDC formats labeled as 'Complete' or 'Condensed'
+    if(!csv_pattern %in% c("Complete", "Condensed"))
+        stop("User must specify 'Complete' or 'Condensed' for csv_pattern argument")
+
+
     ## load file
     x = readLines(file)
     ctn = x[which(grepl("CTN",x))]
     ctn = substr(ctn, regexpr(",", ctn) + 1, nchar(ctn))
     x = utils::read.csv(textConnection(paste0(x[-(1:nskip)],collapse="\n")), stringsAsFactors = FALSE)
+
+
     ## reformat column names
     names(x) = gsub("\\.", "\\_", names(x))
+
+
     ## add CTN variable
     x$Collar_CTN = ctn
+
+
     ## reorder columns
     x = x[,c(ncol(x),1:(ncol(x)-1))]
-    ## Convert Schedule_Set variable to factor
+
+
+    ## Recast Schedule_Set variable to factor
     scheds = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3")
     x$Schedule_Set = factor(x$Schedule_Set, levels = scheds) # convert GPS fix type to factor
-    ## Convert time variables to POSIXct
+
+
+    ## Recast time variables as POSIXct
     x$Acquisition_Time = as.POSIXlt(x$Acquisition_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
     x$Acquisition_Start_Time = as.POSIXlt(x$Acquisition_Start_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
     x$GPS_Fix_Time = as.POSIXlt(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
     x$Receive_Time = as.POSIXlt(x$Receive_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+
+
     ## subset data by GPS_Fix_Attempt and convert GPS_Fix_Attempt to factor
     x = x[x$GPS_Fix_Attempt %in% fix_attempt_keep, ]
     x$GPS_Fix_Attempt = factor(x$GPS_Fix_Attempt, levels = fix_attempt_keep)
+
+
     ## Remove duplicate fix times
     x = x[!duplicated(x$GPS_Fix_Time),]
     if(nrow(x)==0){
         warning(paste0("No valid location data for CTN ", ctn, "."))
         x = list(NULL)
     }
+
     return(x)
 }
 
@@ -71,7 +94,8 @@ import_telirid <- function(file,
 #' import_TelCSVs(path = "../directory_path", csv_pattern = "Complete")}
 
 import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
-    ## message
+
+    ## file name(s) provided
     if(all(grepl(path, ".csv"))){
         nfiles = length(path)
         csv_list = vector("list", nfiles)
@@ -83,6 +107,9 @@ import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
         }
         df = do.call("rbind", csv_list)
     }
+
+
+    ## path to folder containing file(s) provided
     if(length(path) == 1 & !grepl(path, ".csv")){
         files = list.files(path, pattern = csv_pattern, full = TRUE, ...)
         nfiles = length(files)
@@ -96,6 +123,7 @@ import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
         cat("Compiling files ...\n\n")
         df = do.call("rbind", csv_list)
     }
+
     return(df)
 }
 
@@ -113,22 +141,32 @@ import_TelCSVfiles <- function(path, csv_pattern = NULL, ...){
 #' tpf2df("180906015A_1.tpf")}
 
 import_tpf <- function(file){
+
+    ## read in tpf file
     tpf = readLines(file)
+
+
     ## extract ctns
     ctn.marker = "sections.units.parameters.ctnList"
     tpf.line = tpf[grep(ctn.marker,tpf)]
     ctns = unlist(strsplit(tpf.line, split="[{}]"))[2]
     ctns = unlist(strsplit(ctns," "))
+
+
     ## extract imeis
     imei.marker = "sections.units.parameters.iridiumImeiList"
     tpf.line = tpf[grep(imei.marker,tpf)]
     imeis = unlist(strsplit(tpf.line, split="[{}]"))[2]
     imeis = unlist(strsplit(imeis," "))
+
+
     ## set search parameters for fix rate schedules
     sched.markers = c("sections.gps.parameters.qfpScheduleUpdatePeriod",
                       "sections.auxiliary1ScheduleSet.parameters.qfpScheduleUpdatePeriod",
                       "sections.auxiliary2ScheduleSet.parameters.qfpScheduleUpdatePeriod",
                       "sections.auxiliary3ScheduleSet.parameters.qfpScheduleUpdatePeriod")
+
+
     ## custom function to calculate fix rate for a given sched.marker
     calc.tpf.hours = function(tpf, marker){
         days = 0
@@ -146,9 +184,13 @@ import_tpf <- function(file){
         }
         (days * 24) + hours
     }
+
+
     ## extract fix rate schedules
     fixschedule = sapply(sched.markers, calc.tpf.hours, tpf = tpf)
     names(fixschedule) = c("primary", paste0("aux_",1:3))
+
+
     ## compile output data.frame
     df = data.frame(ctn = ctns, imei = imeis, as.data.frame(t(fixschedule)), tpf_file = gsub(".*/","", file))
     return(df)
