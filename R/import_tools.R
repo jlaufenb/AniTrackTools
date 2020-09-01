@@ -20,8 +20,6 @@
 #'
 #' @return Dataframe containing GPS collar data.
 #' @export
-#'
-#' @examples
 
 import_tel_gps <- function(path,
                            collar_type = NULL,
