@@ -3,19 +3,15 @@
 #'
 #' @param path Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
 #' character string specifying path to folder containing Telonics Iridium CSV file(s), or
-#' character string specifying path to root folder containing folders with Telonics Iridium CSV file(s).\cr\cr
-#' NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument.
+#' character string specifying path to root folder containing folder(s) with Telonics Iridium CSV file(s) as subfolder(s).\cr\cr
+#' NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument. Use of the \code{pattern} argument is recommended to avoid importing non-data files.
 #' @param collar_type Character string specifying the type of GPS collar for which data is to be imported. Accepted values include:
 #'   \itemize{
 #'     \item{"Telonics Spreadspectrum"}
 #'     \item{"Telonics Iridium"}
 #'     }
 #' @param nskip Numeric value indicating the number of rows to remove from top of the CSV file
-#' @param report_format Character string specifying Telonics report format.  Accepted values include:
-#'   \itemize{
-#'     \item{"Complete"}
-#'     \item{"Condensed"}
-#'     }
+#' @param pattern Character string used to identify Telonics Iridium CSV file(s) when a folder path is provided for the \code{path} argument. See help file for the \code{list.files} base R function.
 #' @param ... Additional arguments to pass on.
 #'
 #' @return Dataframe containing GPS collar data.
@@ -24,7 +20,7 @@
 import_tel_gps <- function(path,
                            collar_type = NULL,
                            nskip = NULL,
-                           report_format = NULL,
+                           pattern = NULL,
                            ...){
 
     collar_types = c("Telonics Iridium", "Telonics Spreadspectrum")
@@ -49,9 +45,6 @@ import_tel_gps <- function(path,
 
     if (collar_type == "Telonics Iridium"){
 
-        ## code conditions on report formats 'Complete' or 'Condensed'
-        if(!report_format %in% c("Complete", "Condensed"))
-            stop("User must specify 'Complete' or 'Condensed' for report_format argument if importing Telonics Iridium collar data.")
 
         ## file name(s) provided
         if(all(grepl(path, ".csv"))){
@@ -69,11 +62,16 @@ import_tel_gps <- function(path,
 
         ## path to folder containing file(s) provided
         if(length(path) == 1 & !grepl(path, ".csv")){
+
+            ## warning
+            if(is.null(pattern))
+                warning(paste0("Specifying a value for the 'pattern' argument is recommended when searching multiple subfolders within\n",
+                               "a root folder for data files to avoid attempted import of non-data files."))
             files = list.files(path, full = TRUE, ...)
             nfiles = length(files)
             csv_list = vector("list", nfiles)
             for(i in 1:nfiles){
-                csv_list[[i]] = import_telirid(files[i], ...)
+                csv_list[[i]] = import_telirid(files[i], pattern = pattern, ...)
                 cat("------------------------------------------------------------------------------------------\n\n",
                     "Processing file ", i, "of ", nfiles, "\n\n",
                     "File path: ", files[i], "\n\n")
@@ -96,7 +94,6 @@ import_tel_gps <- function(path,
 #' @param file Character string containing path and file name of Telonics Iridium CSV file.
 #' @param nskip Number of rows to remove from top of Iridium CSV file. This number may vary.
 #' @param fix_attempt_keep Character vector containing location quality categories to retain.
-#' @param report_format Character string specifying Telonics report format of CSV files. Acceptable values are \code{Complete} and \code{Condensed}.
 #' @param colname_fun Function used to format column names of output data.frame. Default is the internal function \code{snake_case}.
 #'
 #' @return Formatted data.frame.
@@ -105,7 +102,6 @@ import_tel_gps <- function(path,
 import_telirid <- function(file,
                    nskip = 23,
                    fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
-                   report_format = NULL,
                    recast = TRUE,
                    colname_fun = "snake_case",
                    ...
@@ -118,7 +114,7 @@ import_telirid <- function(file,
     x = utils::read.csv(textConnection(paste0(x[-(1:nskip)],collapse="\n")), stringsAsFactors = FALSE)
     names(x) <- gsub("\\.", "\\_", names(x))
 
-    ## subset data by GPS_Fix_Attempt and convert GPS_Fix_Attempt to factor
+    ## subset data by GPS_Fix_Attempt
     x = x[x$GPS_Fix_Attempt %in% fix_attempt_keep, ]
 
 
