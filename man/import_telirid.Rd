@@ -8,9 +8,8 @@ import_telirid(
   file,
   nskip = 23,
   fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
-  report_format = NULL,
   recast = TRUE,
-  colname_fun = "snake_case",
+  colname_fun = "tolower",
   ...
 )
 }
@@ -21,9 +20,17 @@ import_telirid(
 
 \item{fix_attempt_keep}{Character vector containing location quality categories to retain.}
 
-\item{report_format}{Character string specifying Telonics report format of CSV files. Acceptable values are \code{Complete} and \code{Condensed}.}
+\item{recast}{Logical value specifying whether to recast the following selected variables:
+\itemize{
+  \item{"Schedule_Set"}
+  \item{"Acquisition_Time"}
+  \item{"Acquisition_Start_Time"}
+  \item{"GPS_Fix_Time"}
+  \item{"Receive_Time"}
+  \item{"GPS_Fix_Attempt"}
+  }}
 
-\item{colname_fun}{Function used to format column names of output data.frame. Default is the internal function \code{snake_case}.}
+\item{colname_fun}{Function used to format column names of output data.frame. Default is the \code{tolower} function to format as snake case.}
 }
 \value{
 Formatted data.frame.

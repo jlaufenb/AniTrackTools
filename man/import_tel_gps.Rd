@@ -4,19 +4,13 @@
 \alias{import_tel_gps}
 \title{Import Telonics GPS collar data (generalized version of `import_TelCSVfiles`)}
 \usage{
-import_tel_gps(
-  path,
-  collar_type = NULL,
-  nskip = NULL,
-  report_format = NULL,
-  ...
-)
+import_tel_gps(path, collar_type = NULL, nskip = NULL, pattern = NULL, ...)
 }
 \arguments{
 \item{path}{Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
 character string specifying path to folder containing Telonics Iridium CSV file(s), or
-character string specifying path to root folder containing folders with Telonics Iridium CSV file(s).\cr\cr
-NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument.}
+character string specifying path to root folder containing folder(s) with Telonics Iridium CSV file(s) as subfolder(s).\cr\cr
+NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument. Use of the \code{pattern} argument is recommended to avoid importing non-data files.}
 
 \item{collar_type}{Character string specifying the type of GPS collar for which data is to be imported. Accepted values include:
 \itemize{
@@ -26,13 +20,15 @@ NOTE: When specifying a root folder within which a search of subfolders is condu
 
 \item{nskip}{Numeric value indicating the number of rows to remove from top of the CSV file}
 
-\item{report_format}{Character string specifying Telonics report format.  Accepted values include:
-\itemize{
-  \item{"Complete"}
-  \item{"Condensed"}
-  }}
+\item{pattern}{Character string used to identify Telonics Iridium CSV file(s) when a folder path is provided for the \code{path} argument. See help file for the \code{list.files} base R function.}
 
-\item{...}{Additional arguments to pass on.}
+\item{...}{Additional arguments to pass on.\cr\cr
+NOTE: Common additional arguments to pass include:
+  \itemize{
+    \item{"\code{recursive = TRUE}" when specifying a root folder to search for data files}
+    \item{"\code{recast = TRUE}" to recast selected variables}
+    \item{"\code{colname_fun = 'function name'}" to specify alternative function used to reformat column names (e.g., \code{toupper})}
+    }}
 }
 \value{
 Dataframe containing GPS collar data.
