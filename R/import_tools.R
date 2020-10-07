@@ -22,68 +22,67 @@ import_tel_gps <- function(path,
                            nskip = NULL,
                            pattern = NULL,
                            ...){
+    run.time = system.time({
+        collar_types = c("Telonics Iridium", "Telonics Spreadspectrum")
+        if(!collar_type %in% collar_types)
+            stop("Select your type of collar. Options are: 'Telonics Iridium' or 'Telonics Spreadspectrum'.")
 
-    collar_types = c("Telonics Iridium", "Telonics Spreadspectrum")
-    if(!collar_type %in% collar_types)
-        stop("Select your type of collar. Options are: 'Telonics Iridium' or 'Telonics Spreadspectrum'.")
+        if(is.null(nskip))
+            stop("Must specify number of header lines in CSV file to skip.")
 
-    if(is.null(nskip))
-        stop("Must specify number of header lines in CSV file to skip.")
+        message(paste("\n\nImporting", collar_type, "collar data...\n\n"))
 
-    message(paste("\n\nImporting", collar_type, "collar data...\n\n"))
-
-    # Select which collar import function to use
-    if (collar_type == "Telonics Spreadspectrum"){
-        df <-
-            list.files(path = dir_path,
-                       pattern = "*.csv",
-                       full.names = TRUE,
-                       recursive = TRUE) %>%
-            map_df(function(x) import_telsst(x)) %>%
-            unique()
-    }
-
-    if (collar_type == "Telonics Iridium"){
-
-
-        ## file name(s) provided
-        if(all(grepl(path, ".csv"))){
-            nfiles = length(path)
-            csv_list = vector("list", nfiles)
-            for(i in 1:nfiles){
-                csv_list[[i]] = import_telirid(path[i], ...)
-                cat("------------------------------------------------------------------------------------------\n\n",
-                    "Processing file ", i, "of ", nfiles, "\n\n",
-                    "File path: ", path[i], "\n\n")
-            }
-            df = do.call("rbind", csv_list)
+        # Select which collar import function to use
+        if (collar_type == "Telonics Spreadspectrum"){
+            df <-
+                list.files(path = dir_path,
+                           pattern = "*.csv",
+                           full.names = TRUE,
+                           recursive = TRUE) %>%
+                map_df(function(x) import_telsst(x)) %>%
+                unique()
         }
 
+        if (collar_type == "Telonics Iridium"){
 
-        ## path to folder containing file(s) provided
-        if(length(path) == 1 & !grepl(path, ".csv")){
 
-            ## warning
-            if(is.null(pattern))
-                warning(paste0("Specifying a value for the 'pattern' argument is recommended when searching multiple subfolders within\n",
-                               "a root folder for data files to avoid attempted import of non-data files."))
-            files = list.files(path, full = TRUE, ...)
-            nfiles = length(files)
-            csv_list = vector("list", nfiles)
-            for(i in 1:nfiles){
-                csv_list[[i]] = import_telirid(files[i], pattern = pattern, ...)
-                cat("------------------------------------------------------------------------------------------\n\n",
-                    "Processing file ", i, "of ", nfiles, "\n\n",
-                    "File path: ", files[i], "\n\n")
+            ## file name(s) provided
+            if(all(grepl("\\.csv", path))){
+                nfiles = length(path)
+                csv_list = vector("list", nfiles)
+                for(i in 1:nfiles){
+                    csv_list[[i]] = import_telirid(path[i], ...)
+                    cat("------------------------------------------------------------------------------------------\n\n",
+                        "Processing file ", i, "of ", nfiles, "\n\n",
+                        "File path: ", path[i], "\n\n")
+                }
+                df = do.call("rbind", csv_list)
             }
-            cat("Compiling files ...\n\n")
-            df = do.call("rbind", csv_list)
-        }
-    }
 
+
+            ## path to folder containing file(s) provided
+            if(length(path) == 1 & !any(grepl("\\.csv", path))){
+
+                ## warning
+                if(is.null(pattern))
+                    warning(paste0("Specifying a value for the 'pattern' argument is recommended when searching multiple subfolders within\n",
+                                   "a root folder for data files to avoid attempted import of non-data files."))
+                files = list.files(path, full = TRUE, pattern = pattern, ...)
+                nfiles = length(files)
+                csv_list = vector("list", nfiles)
+                for(i in 1:nfiles){
+                    csv_list[[i]] = import_telirid(files[i], ...)
+                    cat("------------------------------------------------------------------------------------------\n\n",
+                        "Processing file ", i, "of ", nfiles, "\n\n",
+                        "File path: ", files[i], "\n\n")
+                }
+                cat("Compiling files ...\n\n")
+                df = do.call("rbind", csv_list)
+            }
+        }
+    })
+    message(paste0("Import complete. Execution time: ", round(run.time["elapsed"],2), " seconds"))
     return(df)
-    message("Done")
-
 }
 
 
