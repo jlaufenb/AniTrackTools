@@ -18,7 +18,7 @@ import_telirid(
 
 \item{nskip}{Number of rows to remove from top of Iridium CSV file. This number may vary.}
 
-\item{fix_attempt_keep}{Character vector containing location quality categories to retain.}
+\item{fix_attempt_keep}{Character vector containing location quality categories to retain. A value of "All" will return all QFP fixes.}
 
 \item{recast}{Logical value specifying whether to recast the following selected variables:
 \itemize{
