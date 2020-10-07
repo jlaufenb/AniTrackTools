@@ -18,6 +18,7 @@
 #'     \item{"\code{recursive = TRUE}" when specifying a root folder to search for data files}
 #'     \item{"\code{recast = TRUE}" to recast selected variables}
 #'     \item{"\code{colname_fun = 'function name'}" to specify alternative function used to reformat column names (e.g., \code{toupper})}
+#'     \item{"\code{fix_attempt_keep = 'All'}" to return all QFP fixes. Default only returns "Resolved QFP" and "Resolved QFP (Uncertain)".
 #'     }
 #' @return Dataframe containing GPS collar data.
 #' @export
@@ -97,7 +98,7 @@ import_tel_gps <- function(path,
 #'
 #' @param file Character string containing path and file name of Telonics Iridium CSV file.
 #' @param nskip Number of rows to remove from top of Iridium CSV file. This number may vary.
-#' @param fix_attempt_keep Character vector containing location quality categories to retain.
+#' @param fix_attempt_keep Character vector containing location quality categories to retain. A value of "All" will return all QFP fixes.
 #' @param recast Logical value specifying whether to recast the following selected variables:
 #'   \itemize{
 #'     \item{"Schedule_Set"}
@@ -128,6 +129,7 @@ import_telirid <- function(file,
     names(x) <- gsub("\\.", "\\_", names(x))
 
     ## subset data by GPS_Fix_Attempt
+    if(fix_attempt_keep == "All") fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)", "Unresolved QFP")
     x = x[x$GPS_Fix_Attempt %in% fix_attempt_keep, ]
 
 
