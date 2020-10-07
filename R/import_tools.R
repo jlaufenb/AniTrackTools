@@ -15,9 +15,9 @@
 #' @param ... Additional arguments to pass on.\cr\cr
 #' NOTE: Common additional arguments to pass include:
 #'   \itemize{
-#'     \item{"\code{recursive = TRUE} when specifying a root folder to search for data files"}
-#'     \item{"\code{recast = TRUE} to recast selected variables"}
-#'     \item{"\code{colname_fun = 'function name'} to specify alternative function used to reformat column names (e.g., \code{toupper})"}
+#'     \item{"\code{recursive = TRUE}" when specifying a root folder to search for data files}
+#'     \item{"\code{recast = TRUE}" to recast selected variables}
+#'     \item{"\code{colname_fun = 'function name'}" to specify alternative function used to reformat column names (e.g., \code{toupper})}
 #'     }
 #' @return Dataframe containing GPS collar data.
 #' @export
@@ -107,7 +107,7 @@ import_tel_gps <- function(path,
 #'     \item{"Receive_Time"}
 #'     \item{"GPS_Fix_Attempt"}
 #'     }
-#' @param colname_fun Function used to format column names of output data.frame. Default is the internal function \code{snake_case}.
+#' @param colname_fun Function used to format column names of output data.frame. Default is the \code{tolower} function to format as snake case.
 #'
 #' @return Formatted data.frame.
 #'
