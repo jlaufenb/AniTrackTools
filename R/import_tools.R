@@ -12,8 +12,13 @@
 #'     }
 #' @param nskip Numeric value indicating the number of rows to remove from top of the CSV file
 #' @param pattern Character string used to identify Telonics Iridium CSV file(s) when a folder path is provided for the \code{path} argument. See help file for the \code{list.files} base R function.
-#' @param ... Additional arguments to pass on.
-#'
+#' @param ... Additional arguments to pass on.\cr\cr
+#' NOTE: Common additional arguments to pass include:
+#'   \itemize{
+#'     \item{"\code{recursive = TRUE} when specifying a root folder to search for data files"}
+#'     \item{"\code{recast = TRUE} to recast selected variables"}
+#'     \item{"\code{colname_fun = 'function name'} to specify alternative function used to reformat column names (e.g., \code{toupper})"}
+#'     }
 #' @return Dataframe containing GPS collar data.
 #' @export
 
@@ -93,6 +98,15 @@ import_tel_gps <- function(path,
 #' @param file Character string containing path and file name of Telonics Iridium CSV file.
 #' @param nskip Number of rows to remove from top of Iridium CSV file. This number may vary.
 #' @param fix_attempt_keep Character vector containing location quality categories to retain.
+#' @param recast Logical value specifying whether to recast the following selected variables:
+#'   \itemize{
+#'     \item{"Schedule_Set"}
+#'     \item{"Acquisition_Time"}
+#'     \item{"Acquisition_Start_Time"}
+#'     \item{"GPS_Fix_Time"}
+#'     \item{"Receive_Time"}
+#'     \item{"GPS_Fix_Attempt"}
+#'     }
 #' @param colname_fun Function used to format column names of output data.frame. Default is the internal function \code{snake_case}.
 #'
 #' @return Formatted data.frame.
@@ -102,7 +116,7 @@ import_telirid <- function(file,
                    nskip = 23,
                    fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
                    recast = TRUE,
-                   colname_fun = "snake_case",
+                   colname_fun = "tolower",
                    ...
                    ){
 
