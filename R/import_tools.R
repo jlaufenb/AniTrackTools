@@ -18,7 +18,7 @@
 #'     \item{"\code{recursive = TRUE}" when specifying a root folder to search for data files}
 #'     \item{"\code{recast = TRUE}" to recast selected variables}
 #'     \item{"\code{colname_fun = 'function name'}" to specify alternative function used to reformat column names (e.g., \code{toupper})}
-#'     \item{"\code{fix_attempt_keep = 'All'}" to return all QFP fixes. Default only returns "Resolved QFP" and "Resolved QFP (Uncertain)".
+#'     \item{"\code{fix_attempt_keep = 'All'}" to return all QFP fixes. Default only returns "Resolved QFP" and "Resolved QFP (Uncertain)".}
 #'     }
 #' @return Dataframe containing GPS collar data.
 #' @export
