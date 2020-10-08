@@ -16,8 +16,8 @@
 #' telcsv2ATT(telcsv = gps_df, animal_ids = data.frame(collar_id = "700516A", animal_id = "lynx_1"))}
 
 telcsv2ATT <- function(telcsv = NULL, animal_ids = NULL, release_sites = NULL){
-    ti_names = c("Collar_CTN","GPS_Fix_Time","GPS_Fix_Attempt","GPS_Latitude","GPS_Longitude",
-                 "GPS_Horizontal_Dilution","GPS_Satellite_Count","Schedule_Set")
+    ti_names = c("collar_ctn","gps_fix_time","gps_fix_attempt","gps_latitude","gps_longitude",
+                 "gps_horizontal_dilution","gps_satellite_count","schedule_set")
     att_names = c("collar_id","fixtime","fixtype","lat","lon","hdop","nsats","fixsched")
     if(!is.null(telcsv)){
         telcsv = telcsv[,names(telcsv) %in% ti_names]
