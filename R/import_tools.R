@@ -129,7 +129,7 @@ import_telirid <- function(file,
     names(x) <- gsub("\\.", "\\_", names(x))
 
     ## subset data by GPS_Fix_Attempt
-    if(fix_attempt_keep == "All") fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)", "Unresolved QFP")
+    if(any(fix_attempt_keep == "All")) fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)", "Unresolved QFP")
     x = x[x$GPS_Fix_Attempt %in% fix_attempt_keep, ]
 
 
@@ -163,7 +163,11 @@ import_telirid <- function(file,
 
 
         ## reformat column names
-        names(x) = do.call(colname_fun, list(names(x)))
+        if(is.null(colname_fun)){
+            names(x) = gsub("\\_", "\\ ", names(x))
+        }else{
+            names(x) = do.call(colname_fun, list(names(x)))
+        }
     }
 
     return(x)
