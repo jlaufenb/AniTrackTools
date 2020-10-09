@@ -169,7 +169,7 @@ import_telirid <- function(file,
             names(x) = do.call(colname_fun, list(names(x)))
         }
     }
-
+    rownames(x) = NULL
     return(x)
 }
 
