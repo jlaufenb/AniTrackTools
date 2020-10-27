@@ -139,8 +139,8 @@ import_telirid <- function(file,
         x = list(NULL)
     }else{
 
-        ## add CTN variable
-        x$Collar_CTN = ctn
+        ## add collar ID variable
+        x$Collar_ID = ctn
 
 
         ## reorder columns
