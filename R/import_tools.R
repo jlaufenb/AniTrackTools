@@ -151,7 +151,7 @@ import_telirid <- function(file,
         if(recast){
             scheds = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3")
             x$Schedule_Set = factor(x$Schedule_Set, levels = c("Primary","Auxiliary 1","Auxiliary 2","Auxiliary 3"))
-            x$Acquisition_Time = as.POSIXlt(x$Acquisition_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
+            x$Acquisition_Time = as.POSIXct(x$Acquisition_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
             x$Acquisition_Start_Time = as.POSIXlt(x$Acquisition_Start_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
             x$GPS_Fix_Time = as.POSIXlt(x$GPS_Fix_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
             x$Receive_Time = as.POSIXlt(x$Receive_Time, tz = "UTC", format = "%Y.%m.%d %H:%M:%S")
