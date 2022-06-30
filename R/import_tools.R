@@ -111,7 +111,7 @@ import_tel_gps <- function(path,
 #' @param colname_fun Function used to format column names of output data.frame. Default is the \code{tolower} function to format as snake case.
 #'
 #' @return Formatted data.frame.
-#'
+#' @export
 
 import_telirid <- function(file,
                    nskip = 23,
