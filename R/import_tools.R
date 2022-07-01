@@ -25,7 +25,7 @@
 
 import_tel_gps <- function(path,
                            collar_type = NULL,
-                           nskip = NULL,
+#                           nskip = NULL, currently not in use for Iridium collars
                            pattern = NULL,
                            ...){
     run.time = system.time({
@@ -33,20 +33,21 @@ import_tel_gps <- function(path,
         if(!collar_type %in% collar_types)
             stop("Select your type of collar. Options are: 'Telonics Iridium' or 'Telonics Spreadspectrum'.")
 
-        if(is.null(nskip))
-            stop("Must specify number of header lines in CSV file to skip.")
+#        if(is.null(nskip))
+#            stop("Must specify number of header lines in CSV file to skip.")
 
         message(paste("\n\nImporting", collar_type, "collar data...\n\n"))
 
         # Select which collar import function to use
         if (collar_type == "Telonics Spreadspectrum"){
-            df <-
-                list.files(path = dir_path,
-                           pattern = "*.csv",
-                           full.names = TRUE,
-                           recursive = TRUE) %>%
-                map_df(function(x) import_telsst(x)) %>%
-                unique()
+            stop("Telonics Spreadspectrum currently not supported")
+#            df <-
+#                list.files(path = dir_path,
+#                           pattern = "*.csv",
+#                           full.names = TRUE,
+#                           recursive = TRUE) %>%
+#                map_df(function(x) import_telsst(x)) %>%
+#                unique()
         }
 
         if (collar_type == "Telonics Iridium"){
@@ -114,7 +115,6 @@ import_tel_gps <- function(path,
 #' @export
 
 import_telirid <- function(file,
-                   nskip = 23,
                    fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
                    recast = TRUE,
                    colname_fun = "tolower",
@@ -123,6 +123,9 @@ import_telirid <- function(file,
 
     ## load file
     x = readLines(file)
+    header_md <- x[grep("Headers Row,",x)]
+    indx <- regexpr(",",header_md)
+    nskip = as.numeric(substr(header_md,indx+1,nchar(header_md)))
     ctn = x[which(grepl("CTN",x))]
     ctn = substr(ctn, regexpr(",", ctn) + 1, nchar(ctn))
     x = utils::read.csv(textConnection(paste0(x[-(1:nskip)],collapse="\n")), stringsAsFactors = FALSE)
