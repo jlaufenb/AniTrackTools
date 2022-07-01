@@ -125,7 +125,7 @@ import_telirid <- function(file,
     x = readLines(file)
     header_md <- x[grep("Headers Row,",x)]
     indx <- regexpr(",",header_md)
-    nskip = as.numeric(substr(header_md,indx+1,nchar(header_md)))
+    nskip = as.numeric(substr(header_md,indx+1,nchar(header_md))) - 1
     ctn = x[which(grepl("CTN",x))]
     ctn = substr(ctn, regexpr(",", ctn) + 1, nchar(ctn))
     x = utils::read.csv(textConnection(paste0(x[-(1:nskip)],collapse="\n")), stringsAsFactors = FALSE)
