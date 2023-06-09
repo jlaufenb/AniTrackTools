@@ -6,7 +6,6 @@
 \usage{
 import_telirid(
   file,
-  nskip = 23,
   fix_attempt_keep = c("Resolved QFP", "Resolved QFP (Uncertain)"),
   recast = TRUE,
   colname_fun = "tolower",
@@ -15,8 +14,6 @@ import_telirid(
 }
 \arguments{
 \item{file}{Character string containing path and file name of Telonics Iridium CSV file.}
-
-\item{nskip}{Number of rows to remove from top of Iridium CSV file. This number may vary.}
 
 \item{fix_attempt_keep}{Character vector containing location quality categories to retain. A value of "All" will return all QFP fixes.}
 
@@ -31,6 +28,8 @@ import_telirid(
   }}
 
 \item{colname_fun}{Function used to format column names of output data.frame. Default is the \code{tolower} function to format as snake case.}
+
+\item{nskip}{Number of rows to remove from top of Iridium CSV file. This number may vary.}
 }
 \value{
 Formatted data.frame.

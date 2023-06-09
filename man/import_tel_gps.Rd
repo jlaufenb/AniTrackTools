@@ -4,7 +4,7 @@
 \alias{import_tel_gps}
 \title{Import Telonics GPS collar data (generalized version of `import_TelCSVfiles`)}
 \usage{
-import_tel_gps(path, collar_type = NULL, nskip = NULL, pattern = NULL, ...)
+import_tel_gps(path, collar_type = NULL, pattern = NULL, ...)
 }
 \arguments{
 \item{path}{Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
@@ -18,8 +18,6 @@ NOTE: When specifying a root folder within which a search of subfolders is condu
   \item{"Telonics Iridium"}
   }}
 
-\item{nskip}{Numeric value indicating the number of rows to remove from top of the CSV file}
-
 \item{pattern}{Character string used to identify Telonics Iridium CSV file(s) when a folder path is provided for the \code{path} argument. See help file for the \code{list.files} base R function.}
 
 \item{...}{Additional arguments to pass on.\cr\cr
@@ -30,6 +28,8 @@ NOTE: Common additional arguments to pass include:
     \item{"\code{colname_fun = 'function name'}" to specify alternative function used to reformat column names (e.g., \code{toupper})}
     \item{"\code{fix_attempt_keep = 'All'}" to return all QFP fixes. Default only returns "Resolved QFP" and "Resolved QFP (Uncertain)".}
     }}
+
+\item{nskip}{Numeric value indicating the number of rows to remove from top of the CSV file}
 }
 \value{
 Dataframe containing GPS collar data.
