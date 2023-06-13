@@ -178,18 +178,6 @@ import_telirid <- function(file,
 
 
 
-#' Internal Function Used to Reformat Column Names
-#'
-#' @param x Character vector
-#'
-#' @return Character vector in lower snake case format
-#'
-snake_case <- function(x){
-    tolower(gsub("\\.", "\\_", x))
-}
-
-
-
 
 #' Import Telonics TPF File and Extract CTNs, IMEIs, and Fix-Rate Schedules
 #'
@@ -255,66 +243,5 @@ import_tpf <- function(file){
 
     ## compile output data.frame
     df = data.frame(ctn = ctns, imei = imeis, as.data.frame(t(fixschedule)), tpf_file = gsub(".*/","", file))
-    return(df)
-}
-
-
-
-
-#' Import Telonics Iridium CSV File(s)
-#'
-#' @param path Character vector containing path(s) and file name(s) of Telonics Iridium CSV file(s),
-#' character string specifying path to folder containing Telonics Iridium CSV file(s), or
-#' character string specifying path to root folder containing folders with Telonics Iridium CSV file(s).\cr\cr
-#' NOTE: When specifying a root folder within which a search of subfolders is conducted, user must pass \code{recursive = TRUE} as an additional argument.
-#' @param ... Additional arguments to pass on.
-#'
-#' @return Dataframe containing GPS collar data.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' ## import only using file name based current working directory
-#' import_TelCSVfiles(path = "700516A Complete.csv")
-#'
-#' ## import using character vector specifying directory paths and file names
-#' files <- list.files("../directory_path", pattern = "Complete", full = TRUE)
-#' import_TelCSVfiles(path = files)
-#'
-#' ## import using character string specifying directory path to folder storing files
-#' import_TelCSVs(path = "../directory_path", csv_pattern = "Complete")}
-
-import_TelCSVfiles <- function(path, ...){
-
-    ## file name(s) provided
-    if(all(grepl(path, ".csv"))){
-        nfiles = length(path)
-        csv_list = vector("list", nfiles)
-        for(i in 1:nfiles){
-            csv_list[[i]] = import_telirid(path[i], ...)
-            cat("------------------------------------------------------------------------------------------\n\n",
-                "Processing file ", i, "of ", nfiles, "\n\n",
-                "File path: ", path[i], "\n\n")
-        }
-        df = do.call("rbind", csv_list)
-    }
-
-
-    ## path to folder containing file(s) provided
-    if(length(path) == 1 & !grepl(path, ".csv")){
-        files = list.files(path, full = TRUE, ...)
-        nfiles = length(files)
-        csv_list = vector("list", nfiles)
-        for(i in 1:nfiles){
-            csv_list[[i]] = import_telirid(files[i], ...)
-            cat("------------------------------------------------------------------------------------------\n\n",
-                "Processing file ", i, "of ", nfiles, "\n\n",
-                "File path: ", files[i], "\n\n")
-        }
-        cat("Compiling files ...\n\n")
-        df = do.call("rbind", csv_list)
-    }
-
     return(df)
 }
